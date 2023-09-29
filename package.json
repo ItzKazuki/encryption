@@ -1,11 +1,12 @@
 {
-  "name": "enkripsi-test",
-  "version": "1.0.0",
+  "author": "ItzKazukikun",
   "description": "test enkripsi",
+  "license": "ISC",
   "main": "index.js",
+  "name": "enkripsi-test",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "ItzKazukikun",
-  "license": "ISC"
+  "type": "module",
+  "version": "1.0.0"
 }
