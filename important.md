@@ -1,0 +1,1 @@
+ini masih butuh perbaikan karena data yang masuk tidak bisa ditambahkan spasi/tab jadinya ya saat di decrypt error text nya gabung semua.

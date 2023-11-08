@@ -1,12 +1,11 @@
 import fs from 'fs';
+import sleep from './lib/sleep.js';
+import checkKey from './lib/checkKey.js';
 import * as readline from 'node:readline/promises';
+import { encrypt, decrypt } from './lib/simetris.js';
 import { stdin as input, stdout as output } from 'node:process';
 
 const rl = readline.createInterface({ input, output });
-
-async function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 async function main() {
     let coba = 0;
@@ -28,17 +27,9 @@ async function main() {
         switch(coba) {
             case 1: 
                 const textEncrypt = await rl.question('masukan text yang mau di encrypt: ')
-                const keyEncrypt = parseInt(await rl.question('masukan kunci nya (1 - 94): '));
+                const keyEncrypt = parseInt(await rl.question('masukan kunci nya (1 - 93): '));
 
-                if(isNaN(keyEncrypt)) {
-                    console.log('something error, are you sure the key is integer?');
-                    break;
-                }
-
-                if(keyEncrypt >= 94) {
-                    console.log('key must under 94, please try again later');
-                    break;
-                }
+                if(checkKey(keyEncrypt)) break;
 
                 console.log('\n')
                 await sleep(1000);
@@ -46,17 +37,9 @@ async function main() {
                 break;
             case 2:
                 const textDecrypt = await rl.question('masukan text yang sudah di encrypt: ')
-                const keyDecrypt = parseInt(await rl.question('masukan kunci nya (1 - 94): '));
+                const keyDecrypt = parseInt(await rl.question('masukan kunci nya (1 - 93): '));
 
-                if(isNaN(keyDecrypt)) {
-                    console.log('something error, are you sure the key is integer?');
-                    break;
-                }
-
-                if(keyDecrypt >= 94) {
-                    console.log('key must under 94, please try again later');
-                    break;
-                }
+                if(checkKey(keyDecrypt)) break;
 
                 console.log('\n');
                 await sleep(1000);
@@ -65,24 +48,16 @@ async function main() {
             case 3:
                 // pertama  file asli nya di buka, lalu di ambil isi nya, di encrypt terlebih dahulu lalu di buat file baru. baru di hapus file aslinya. file baru wajib menggunakan ekstensi .kze
                 const nameFileEncrypt = await rl.question('masukan lokasi file: ')
-                const keyFileEncrypt = parseInt(await rl.question('masukan kunci nya (1 - 94): '));
+                const keyFileEncrypt = parseInt(await rl.question('masukan kunci nya (1 - 93): '));
 
-                if(isNaN(keyFileEncrypt)) {
-                    console.log('something error, are you sure the key is integer?');
-                    break;
-                }
-
-                if(keyFileEncrypt >= 94) {
-                    console.log('key must under 94, please try again later');
-                    break;
-                }
+                if(checkKey(keyFileEncrypt)) break;
 
                 if(nameFileEncrypt.substring(nameFileEncrypt.lastIndexOf('.')+1) !== 'txt') {
                     console.log('error: file must be txt file\n');
                     break;
                 }
 
-                let contentEncrypt = fs.readFileSync(nameFileEncrypt, 'utf8')
+                let contentEncrypt = fs.readFileSync(nameFileEncrypt, 'utf8');
                 console.log('\ngetting file...');
                 await sleep(1000);
 
@@ -102,20 +77,12 @@ async function main() {
             case 4:
                 // pertama  file asli nya di buka, lalu di ambil isi nya, di encrypt terlebih dahulu lalu di buat file baru. baru di hapus file aslinya. file baru wajib menggunakan ekstensi .kze
                 const nameFileDecrypt = await rl.question('masukan lokasi file: ')
-                const keyFileDecrypt = parseInt(await rl.question('masukan kunci nya (1 - 94): '));
+                const keyFileDecrypt = parseInt(await rl.question('masukan kunci nya (1 - 93): '));
 
-                if(isNaN(keyFileDecrypt)) {
-                    console.log('something error, are you sure the key is integer?');
-                    break;
-                }
-
-                if(keyFileDecrypt >= 94) {
-                    console.log('key must under 94, please try again later');
-                    break;
-                }
+                if(checkKey(keyFileDecrypt)) break;
 
                 if(nameFileDecrypt.substring(nameFileDecrypt.lastIndexOf('.')+1) !== 'kze') {
-                    console.log('error: file must be kze file\n');
+                    console.log('error: file must be .kze file\n');
                     break;
                 }
 
@@ -139,74 +106,10 @@ async function main() {
             case 5:
                 console.log('Bye....');
                 await sleep(1000);
-                process.exit()
-                break;
+                process.exit();
         }
     }
 }
-
-// buat function dimana param nya text dan key, dimana text adalah text yang mau di encrypt. key adalah kunci utamanya.
-// functionnya 2, encrypt = +, decrypt = -
-
-function encrypt(text, key) {
-    let result = '';
-
-    for (let i = 0; i <= text.length - 1; i++) {
-        const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-={}[]:;\'"<,>./?~`\\|';
-        const whereAplhabet = alphabet.indexOf(text.charAt(i)); // dapet alphabet index nya, tinggal di ubah/ di tulis ulang
-        let encryptIndex = whereAplhabet + key;
-
-        // kondisi
-        if(encryptIndex >= alphabet.length) {
-            result += alphabet.charAt(encryptIndex - alphabet.length)
-        } else { 
-            result += alphabet.charAt(encryptIndex)
-        }
-
-        // debug
-        // console.log(alphabet.charAt(encryptIndex))
-        // console.log(`${char} index ke-${whereAplhabet}`)
-        // console.log(encryptIndex)
-        
-    }
-
-    return {
-        text: text,
-        key: key,
-        result: result
-    }
-}
-
-function decrypt(text, key) {
-    let result = '';
-
-    for (let i = 0; i <= text.length - 1; i++) {
-        const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-={}[]:;\'"<,>./?~`\\|';
-        const whereAplhabet = alphabet.indexOf(text.charAt(i)); // dapet alphabet index nya, tinggal di ubah/ di tulis ulang
-        let decryptIndex = whereAplhabet - key;
-
-        // kondisi
-        if(decryptIndex == -1) {
-            result += ' ';
-        } else if (decryptIndex < 0) {
-            result += alphabet.charAt(decryptIndex + alphabet.length)
-        } else {
-            result += alphabet.charAt(decryptIndex)
-        }
-
-        // debug
-        // console.log(`${char} index ke-${whereAplhabet}`)
-        // console.log(decryptIndex)
-        
-    }
-
-    return {
-        text: text,
-        key: key,
-        result: result
-    }
-}
-
 
 // const key = 95
 // const resEncrypt = encrypt('Hallo, Ini private message. Salam kenal', key);
